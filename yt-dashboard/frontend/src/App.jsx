@@ -1,13 +1,17 @@
 
 import './App.css'
+import { BrowserRouter, Route, Routes } from 'react-router-dom' ;
+import MainDashboard from './components/MainDashboard';
+import Login from './components/Login';
 
 function App() {
   return (
-    <>
-      <div>
-        <h4> Inside the Main Section here </h4>
-      </div>
-    </>
+    <BrowserRouter>
+      <Routes> 
+        <Route path = "/" element = {<Login />}>  </Route>
+        <Route path = "/dashboard" element = {<MainDashboard />}>  </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
