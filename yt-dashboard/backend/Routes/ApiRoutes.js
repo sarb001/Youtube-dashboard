@@ -29,7 +29,6 @@ router.post('/login', async(req,res) => {
      }
 })
 
-
 router.get('/callbackurl' , async(req,res) => {
     try {
            const code = req.query.code;
@@ -54,6 +53,47 @@ router.get('/callbackurl' , async(req,res) => {
         console.log(' callback error =',error);
         return res.status(500).json({
           message : "oAuth Error"
+        })
+    }
+})
+
+router.post('/videoid' , async(req,res) => {
+    try {
+        
+        const AccessToken = req?.headers?.authorization.split('Bearer')[1];
+
+         if(!AccessToken){
+            return res.status(401).json({
+                activeaccesstoken : false,
+                success : false,
+                message : "UnAuthorized Error"
+            })
+        }
+
+        const VideoRes = await axios.get(`${process.env.MAIN_URL}/videos` , {
+            params : {
+                part :  'snippet,contentDetails,statistics',
+                id : 'zhuYZAIKHCQ',
+                key : process.env.API_KEY
+            },
+            headers : {
+                'Content-Type' : 'application/json',
+                'Authorization' : `Bearer ${AccessToken}`
+            }
+        })
+
+        console.log('Response -',VideoRes?.data?.items[0]);
+        
+        return res.status(200).json({
+            videoinfo : VideoRes?.data?.items[0],
+            success : true,
+            message : "Video Details Fetched"
+        })
+
+    } catch (error) {
+         console.log(' video error =',error);
+        return res.status(500).json({
+          message : "Specific Video Error"
         })
     }
 })
