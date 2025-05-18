@@ -8,7 +8,7 @@ const app = express();
 dotenv.config();
 
 app.use(cors({
-    origin : 'http://localhost:5173',
+    origin : process?.env?.FRONTEND_PROD_URL || 'http://localhost:5173',
     credentials : true,
     methods : ['POST','PUT','GET','DELETE']
 }));
