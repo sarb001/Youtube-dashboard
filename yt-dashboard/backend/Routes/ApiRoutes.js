@@ -1,11 +1,10 @@
+
 import express from 'express';
-
-
 const router = express.Router();
 
 router.get('/testingendpoint', async(req,res) => {
      try {
-        console.log('working here');
+        console.log('testingendpoint ');
         return res.status(200).json({
             message : "Ending here"
         })
@@ -16,7 +15,10 @@ router.get('/testingendpoint', async(req,res) => {
 
 router.get('/newone', async(req,res) => {
      try {
-        console.log('working here');
+        console.log('working newone ');
+          return res.status(200).json({
+            message : "Ending here new "
+        })
     } catch (error) {
         console.log('working here',error);
      }
