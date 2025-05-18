@@ -98,4 +98,54 @@ router.post('/videoid' , async(req,res) => {
     }
 })
 
+router.put('/contentdetails' , async(req,res) => {
+        try {
+
+             const AccessToken = req?.headers?.authorization.split('Bearer')[1];
+
+            if(!AccessToken){
+                return res.status(401).json({
+                    activeaccesstoken : false,
+                    success : false,
+                    message : "UnAuthorized Error"
+                })
+            }
+
+            const Body = req.body;
+            console.log('body data =',Body);
+
+            const VideoRes = await axios.put(`${process.env.MAIN_URL}/videos` , {
+                "id" : Body?.videoid,
+                "snippet" : {
+                    "title" : Body?.newTitle,
+                    "description" : Body?.newDesc,
+                    "categoryId" : Body.Categoryid
+                }
+            },{
+                params : {
+                    part :  'snippet,contentDetails,statistics',
+                    id : 'zhuYZAIKHCQ',
+                    key : process.env.API_KEY
+                },
+                headers : {
+                    'Content-Type' : 'application/json',
+                    'Authorization' : `Bearer ${AccessToken}`
+                }
+            });
+
+            console.log('Response updated =',VideoRes);
+
+            return res.status(200).json({
+                success : true,
+                message : " Video Title updated "
+            })
+
+        }catch(error){
+            console.log('content error =',error);
+            return res.status(500).json({
+              message : "Unable to change New Title"
+            })
+        }
+})
+
 export default router;
