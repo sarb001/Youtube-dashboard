@@ -16,8 +16,13 @@ const MainDashboard = () => {
 
     const[Title,setTitle] = useState('');
     const[Desc,setDesc] = useState('');
+    const[Categoryid,setCategoryid] = useState('');
+    const[videoid,setvideoid] = useState('');
 
     const[videoimg,setvideoimg] = useState(null);
+
+    const[newTitle,setNewTitle] = useState('');
+    const[newDesc,setNewDesc] = useState('');
 
     // change title ,desc
     // image
@@ -37,11 +42,37 @@ const MainDashboard = () => {
             setDesc(VideoResp?.data?.videoinfo?.snippet?.description);
             setvideoimg(VideoResp?.data?.videoinfo?.snippet.thumbnails?.default?.url);
 
-            console.log('title is -',Title);
-            console.log('desc is -',Desc);
+            setCategoryid(VideoResp?.data?.videoinfo?.snippet?.categoryId);
+            setvideoid(VideoResp?.data?.videoinfo?.id);
+
+
+            console.log('inside video id=',VideoResp?.data?.videoinfo?.snippet?.categoryId);
+            console.log('inside cate id=',VideoResp?.data?.videoinfo?.id);
 
         } catch (error) {
              console.log('video resp error-',error);
+        }
+    }
+
+    const DetailsChangeHandler = async() => {
+        try {
+
+            if(Categoryid && videoid){
+                const Response = await axios.put('/api/v1/contentdetails',{
+                    newTitle,newDesc,Categoryid,videoid
+                },{
+                    headers : {
+                        'Content-Type' : 'application/json',
+                        'Authorization' : `Bearer ${AccToken}`    
+                    }
+                });
+                console.log('Response =',Response);
+                setDesc("");
+                setNewDesc("");
+            }
+
+       }catch(error) {
+          console.log('Response errror =',error);
         }
     }
 
@@ -53,7 +84,18 @@ const MainDashboard = () => {
            <div style = {{padding:'25px'}}>
                 <div>
                     <div> <img src = {videoimg} alt = "videoimage" /> </div>
+                    <div style = {{margin:'15px'}}>
                         <h3> Title is - {Title} </h3>
+                        <input type = "text" placeholder = "Enter New title..." value = {newTitle} 
+                           onChange={(e) => setNewTitle(e.target.value)}
+                        />
+                        <input type = "text" placeholder = "Enter New Desc..." value = {newDesc} 
+                           onChange={(e) => setNewDesc(e.target.value)}
+                        />
+                        <div style = {{padding:'10px'}}>
+                            <button onClick={DetailsChangeHandler}> Change Title & Desc </button>
+                        </div>
+                    </div>
                         <h3> Description is - {Desc} </h3>
                 </div>
              
