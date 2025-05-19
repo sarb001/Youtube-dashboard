@@ -9,6 +9,8 @@ dotenv.config();
 
 const allowedOrigins = process.env.NODE_ENV === 'production' ? process?.env?.FRONTEND_PROD_URL : 'http://localhost:5173'
 
+console.log('allowed origin =',allowedOrigins);
+
 app.use(cors({
     origin : allowedOrigins,
     credentials : true,
