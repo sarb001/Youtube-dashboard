@@ -1,6 +1,7 @@
 import axios from "axios"
 import { useState } from "react";
 import {  useSearchParams } from 'react-router-dom';
+import { BaseUrl } from "../App";
 
 const MainDashboard = () => {
 
@@ -29,7 +30,7 @@ const MainDashboard = () => {
 
     const VideoHandler = async() => {
         try {
-            const VideoResp = await axios.get('/api/v1/videoid',{
+            const VideoResp = await axios.get(`${BaseUrl}/api/v1/videoid`,{
                 headers : {
                     'Content-Type' : 'application/json',
                     'Authorization' : `Bearer ${AccToken}`
@@ -56,7 +57,7 @@ const MainDashboard = () => {
         try {
 
             if(Categoryid && videoid){
-                const Response = await axios.put('/api/v1/contentdetails',{
+                const Response = await axios.put(`${BaseUrl}/api/v1/contentdetails`,{
                     newTitle,newDesc,Categoryid,videoid
                 },{
                     headers : {

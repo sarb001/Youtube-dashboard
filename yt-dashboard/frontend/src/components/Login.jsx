@@ -1,9 +1,8 @@
 import axios from "axios"
+import { BaseUrl } from "../App";
 
 const Login = () => {
 
-    const BaseUrl = import.meta.env.VITE_API_BASE_URL;
-    console.log('base url is =',BaseUrl);
 
     const Googleloginhandler = async() => {
         try {
