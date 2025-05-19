@@ -51,7 +51,7 @@ router.get('/callbackurl' , async(req,res) => {
     }
 })
 
-router.post('/videoid' , async(req,res) => {
+router.get('/videoid' , async(req,res) => {
     try {
         
         const AccessToken = req?.headers?.authorization.split('Bearer')[1];
