@@ -2,11 +2,12 @@ import axios from 'axios';
 import express from 'express';
 const router = express.Router();
 
+const REDIRECT_URI = process.env.NODE_ENV === 'production' ? process.env.BACKEND_AUTH_URL : process.env.Redirect_uri
 
 router.post('/login', async(req,res) => {
      try {
          console.log('working login here ');
-         const OAuthUrl =  `${process.env.AUTH_URL}?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.Redirect_uri}&response_type=code&scope=${process.env.Scope}&access_type=offline&prompt=consent`;
+         const OAuthUrl =  `${process.env.AUTH_URL}?client_id=${process.env.CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${process.env.Scope}&access_type=offline&prompt=consent`;
 
         console.log('Auth url is -',OAuthUrl);
         return res.json({  url : OAuthUrl })
@@ -29,7 +30,7 @@ router.get('/callbackurl' , async(req,res) => {
            code,
            client_id : process.env.CLIENT_ID,
            client_secret : process.env.CLIENT_SECRET,
-           redirect_uri: process.env.Redirect_uri,
+           redirect_uri: REDIRECT_URI,
            grant_type : 'authorization_code',
         }, { headers : { 'Content-Type' : 'application/json' }})
   
