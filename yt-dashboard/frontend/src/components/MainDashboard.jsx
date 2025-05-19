@@ -29,7 +29,7 @@ const MainDashboard = () => {
 
     const VideoHandler = async() => {
         try {
-            const VideoResp = await axios.post('/api/v1/videoid',{},{
+            const VideoResp = await axios.get('/api/v1/videoid',{
                 headers : {
                     'Content-Type' : 'application/json',
                     'Authorization' : `Bearer ${AccToken}`

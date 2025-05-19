@@ -7,7 +7,11 @@ const Login = () => {
 
     const Googleloginhandler = async() => {
         try {
-            const Res = await axios.post(`${BaseUrl}/api/v1/login`)
+            const Res = await axios.post(`${BaseUrl}/api/v1/login`,{},{
+                headers : {
+                    'Content-Type' : 'application/json',
+                }
+            })
             console.log('Respo -',Res);
             window.location.href = Res?.data?.url
         } catch (error) {
