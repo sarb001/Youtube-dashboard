@@ -4,6 +4,9 @@ const router = express.Router();
 
 const REDIRECT_URI = process.env.NODE_ENV === 'production' ? process.env.BACKEND_AUTH_URL : process.env.Redirect_uri
 
+const FRONTEND_URL = process.env.NODE_ENV === 'production' ? process.env.FRONTEND_PROD_URL : 'http://localhost:5173'
+
+
 router.post('/login', async(req,res) => {
      try {
          console.log('working login here ');
@@ -38,7 +41,7 @@ router.get('/callbackurl' , async(req,res) => {
         console.log(' tokens are =',access_token , refresh_token);
 
 
-        return res.status(200).redirect(`http://localhost:5173/dashboard?accesstoken=${access_token}&refreshtoken=${refresh_token}`)
+        return res.status(200).redirect(`${FRONTEND_URL}/dashboard?accesstoken=${access_token}&refreshtoken=${refresh_token}`)
         
     }catch(error){
         console.log(' callback error =',error);
