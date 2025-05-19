@@ -12,8 +12,6 @@ const MainDashboard = () => {
     localStorage.setItem('acctoken',AccToken);
     localStorage.setItem('refreshtoken',RefToken);
 
-    // const[videoDetails,setVideoDetails] = useState('');
-
     const[Title,setTitle] = useState('');
     const[Desc,setDesc] = useState('');
     const[Categoryid,setCategoryid] = useState('');
