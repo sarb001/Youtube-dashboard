@@ -7,8 +7,10 @@ import cors from 'cors';
 const app = express();
 dotenv.config();
 
+const allowedOrigins = process.env.NODE_ENV === 'production' ? process?.env?.FRONTEND_PROD_URL : 'http://localhost:5173'
+
 app.use(cors({
-    origin : process?.env?.FRONTEND_PROD_URL || 'http://localhost:5173',
+    origin : allowedOrigins,
     credentials : true,
     methods : ['POST','PUT','GET','DELETE']
 }));
