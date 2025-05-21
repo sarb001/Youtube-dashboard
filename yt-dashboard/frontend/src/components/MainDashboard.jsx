@@ -17,14 +17,14 @@ const MainDashboard = () => {
     const[Desc,setDesc] = useState('');
     const[Categoryid,setCategoryid] = useState('');
     const[videoid,setvideoid] = useState('');
+    const[channelid,setchannelid] = useState('');
 
     const[videoimg,setvideoimg] = useState(null);
 
     const[newTitle,setNewTitle] = useState('');
     const[newDesc,setNewDesc] = useState('');
 
-    // change title ,desc
-    // image
+    const[newcomment,setnewcomment] = useState('');
     // write comment and reply it
     /// delete comment as well
 
@@ -44,10 +44,6 @@ const MainDashboard = () => {
             setCategoryid(VideoResp?.data?.videoinfo?.snippet?.categoryId);
             setvideoid(VideoResp?.data?.videoinfo?.id);
 
-
-            console.log('inside video id=',VideoResp?.data?.videoinfo?.snippet?.categoryId);
-            console.log('inside cate id=',VideoResp?.data?.videoinfo?.id);
-
         } catch (error) {
              console.log('video resp error-',error);
         }
@@ -66,13 +62,48 @@ const MainDashboard = () => {
                     }
                 });
                 console.log('Response =',Response);
-                setDesc("");
+                setNewTitle("");
                 setNewDesc("");
             }
 
        }catch(error) {
           console.log('Response errror =',error);
         }
+    }
+
+    const AllCommenthandler = async() => {
+
+        try {
+            const Response = await axios.get(`${BaseUrl}/api/v1/allcomments`,{
+                  headers : {
+                    'Content-Type' : 'application/json',
+                    'Authorization' : `Bearer ${AccToken}`
+                  }
+            });
+
+            console.log('Response =',Response?.data?.allcomments);
+            setchannelid(Response?.data?.allcomments?.channelid);
+
+        } catch (error) {
+            console.log('error =',error);
+        }
+    }
+
+    const newcommenthandler = async() => {
+        console.log('channel id =',channelid);
+
+        // try {
+        //     const Response = await axios.post(`${BaseUrl}/api/v1/newcomment`, newcomment , {
+        //         headers : {
+        //                'Content-Type' : 'application/json',
+        //                'Authorization' : `Bearer ${AccToken}`
+        //             }
+        //     });
+        //     console.log('Response comment =>',Response);
+        // } catch (error) {
+        //     console.log('new post comment error =',error);
+        // }
+        
     }
 
     return (
@@ -85,19 +116,38 @@ const MainDashboard = () => {
                     <div> <img src = {videoimg} alt = "videoimage" /> </div>
                     <div style = {{margin:'15px'}}>
                         <h3> Title is - {Title} </h3>
-                        <input type = "text" placeholder = "Enter New title..." value = {newTitle} 
-                           onChange={(e) => setNewTitle(e.target.value)}
-                        />
-                        <input type = "text" placeholder = "Enter New Desc..." value = {newDesc} 
-                           onChange={(e) => setNewDesc(e.target.value)}
-                        />
+                        <div>
+                            <input type = "text" placeholder = "Enter New title..." value = {newTitle} 
+                            onChange={(e) => setNewTitle(e.target.value)}
+                            />
+                         </div>
+                         <div>
+                            <input type = "text" placeholder = "Enter New Desc..." value = {newDesc} 
+                            onChange={(e) => setNewDesc(e.target.value)}
+                            />
+                           </div>
                         <div style = {{padding:'10px'}}>
                             <button onClick={DetailsChangeHandler}> Change Title & Desc </button>
                         </div>
                     </div>
                         <h3> Description is - {Desc} </h3>
                 </div>
-             
+
+                <div>
+                        <h3> All Comments </h3>
+                        <div>
+                            <button onClick={AllCommenthandler}> Get All Comments </button>
+                        </div>
+                </div>
+
+                <div>
+                    <h3> Add New Comment </h3>
+                    <input type = "text" placeholder="Enter new comment" 
+                     value={newcomment} onChange={(e) => setnewcomment(e.target.value)}
+                    />
+                    <button onClick={newcommenthandler}> Add New Comment </button>
+                </div>
+            
             </div>
            </div>
         </div>
