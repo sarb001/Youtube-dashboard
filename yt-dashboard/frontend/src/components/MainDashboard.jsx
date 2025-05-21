@@ -18,13 +18,14 @@ const MainDashboard = () => {
     const[Categoryid,setCategoryid] = useState('');
     const[videoid,setvideoid] = useState('');
     const[channelid,setchannelid] = useState('');
-
     const[videoimg,setvideoimg] = useState(null);
 
     const[newTitle,setNewTitle] = useState('');
     const[newDesc,setNewDesc] = useState('');
 
     const[newcomment,setnewcomment] = useState('');
+    const[allcomments,setallcomments] = useState([]);
+
     // write comment and reply it
     /// delete comment as well
 
@@ -40,7 +41,7 @@ const MainDashboard = () => {
             setTitle(VideoResp?.data?.videoinfo?.snippet?.title);
             setDesc(VideoResp?.data?.videoinfo?.snippet?.description);
             setvideoimg(VideoResp?.data?.videoinfo?.snippet.thumbnails?.default?.url);
-
+            setchannelid(VideoResp?.data?.videoinfo?.snippet?.channelId)
             setCategoryid(VideoResp?.data?.videoinfo?.snippet?.categoryId);
             setvideoid(VideoResp?.data?.videoinfo?.id);
 
@@ -82,7 +83,7 @@ const MainDashboard = () => {
             });
 
             console.log('Response =',Response?.data?.allcomments);
-            setchannelid(Response?.data?.allcomments?.channelid);
+            setallcomments(Response?.data?.allcomments);
 
         } catch (error) {
             console.log('error =',error);
@@ -94,7 +95,7 @@ const MainDashboard = () => {
 
         try {
             const Response = await axios.post(`${BaseUrl}/api/v1/newcomment`, {
-                newcomment ,channelid
+                newcomment ,channelid,videoid
             } , {
                 headers : {
                        'Content-Type' : 'application/json',
@@ -102,6 +103,7 @@ const MainDashboard = () => {
                     }
             });
             console.log('Response comment =>',Response);
+            setnewcomment("");
         } catch (error) {
             console.log('new post comment error =',error);
         }
@@ -140,14 +142,27 @@ const MainDashboard = () => {
                         <div>
                             <button onClick={AllCommenthandler}> Get All Comments </button>
                         </div>
+                        <div>
+                            {allcomments?.map((i,index) => {
+                                return (
+                                    <div key = {index}> 
+                                      {i?.textOriginal}  
+                                    </div>
+                                )
+                            })}
+                        </div>
                 </div>
 
                 <div>
                     <h3> Add New Comment </h3>
-                    <input type = "text" placeholder="Enter new comment" 
-                     value={newcomment} onChange={(e) => setnewcomment(e.target.value)}
-                    />
-                    <button onClick={newcommenthandler}> Add New Comment </button>
+                    <div>
+                            <input type = "text" placeholder="Enter new comment" 
+                            value={newcomment} onChange={(e) => setnewcomment(e.target.value)}
+                            />
+                     </div>
+                     <div style = {{paddingTop:'4%'}}>
+                       <button onClick={newcommenthandler}> Add New Comment </button>
+                     </div>
                 </div>
             
             </div>
