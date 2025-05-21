@@ -174,12 +174,10 @@ router.get('/allcomments' , async(req,res) => {
             console.log(' All comments Response =',Response?.data);
 
             const MainComment = Response?.data?.items.map(i  => i?.snippet?.topLevelComment?.snippet?.textOriginal);
-            const ChannelId = Response?.data?.items.map(i  => i?.snippet?.topLevelComment?.snippet?.channelId);
-            
+
             return res.status(200).json({
                 allcomments : Response?.data?.items.map(i => ({
                      textOriginal : i?.snippet?.topLevelComment?.snippet?.textOriginal,
-                     channelid :  i?.snippet?.topLevelComment?.snippet?.channelId   
                 })),
                 success : true,
                 message : " Fetched Alll Comments "
@@ -196,15 +194,46 @@ router.get('/allcomments' , async(req,res) => {
 router.post('/newcomment' , async(req,res) => {
      try {
         
-        const {  newcomment , channelid } = req.body;
-        console.log('new coment =',{newcomment ,channelid})
+        const {  newcomment , channelid , videoid } = req.body;
+        console.log('new coment =',{newcomment ,channelid ,videoid})
 
-        return req.status(200).json({
-            message : " Comment Posted "
-        })
+           const AccessToken = req?.headers?.authorization.split('Bearer')[1];
+
+            if(!AccessToken){
+                return res.status(401).json({
+                    success : false,
+                    message : "UnAuthorized Error"
+                })
+            }
+
+            await axios.post(`${process.env.MAIN_URL}/commentThreads`,
+                {
+                "snippet": {
+                    "channelId": channelid,
+                    "topLevelComment": {
+                        "snippet": {
+                            "textOriginal": newcomment
+                        }
+                    },
+                    "videoId": videoid
+                }
+            },{
+                params : {
+                    part :  'snippet,replies',
+                    key : process.env.API_KEY,
+                },
+                headers : {
+                    'Content-Type' : 'application/json',
+                    'Authorization' : `Bearer ${AccessToken}`
+                }
+            });
+
+            return res.status(200).json({
+                message : " Comment Posted "
+            })
 
      } catch(error){
-         console.log(' new comments error =',error);
+            console.log(' new comments error =',error);
             return res.status(500).json({
               message : "Unable to post New Comment"
          })
