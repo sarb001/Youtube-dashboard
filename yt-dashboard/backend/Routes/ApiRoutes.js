@@ -9,11 +9,12 @@ dotenv.config();
 const REDIRECT_URI = process.env.NODE_ENV === 'production' ? process?.env?.BACKEND_AUTH_URL : process?.env?.Redirect_uri
 const FRONTEND_URL = process.env.NODE_ENV === 'production' ? process.env.FRONTEND_PROD_URL : 'http://localhost:5173'
 
+const Scope = ['https://www.googleapis.com/auth/youtube','https://www.googleapis.com/auth/youtube.force-ssl'].join(' ');
 
 router.post('/login', async(req,res) => {
      try {
          console.log('working login here ');
-         const OAuthUrl =  `${process.env.AUTH_URL}?client_id=${process.env.CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${process.env.Scope}&access_type=offline&prompt=consent`;
+         const OAuthUrl =  `${process.env.AUTH_URL}?client_id=${process.env.CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${Scope}&access_type=offline&prompt=consent`;
 
         console.log('Auth url is -',OAuthUrl);
         return res.json({  url : OAuthUrl })
@@ -149,7 +150,7 @@ router.get('/allcomments' , async(req,res) => {
     try {
         
            const AccessToken = req?.headers?.authorization.split('Bearer')[1];
-           console.log('acc token =',AccessToken);
+           console.log('acc comment token =',AccessToken);
 
             if(!AccessToken){
                 return res.status(401).json({
@@ -162,7 +163,7 @@ router.get('/allcomments' , async(req,res) => {
                 params : {
                     part :  'snippet,replies',
                     videoId : 'zhuYZAIKHCQ',
-                    key : process.env.API_KEY
+                    key : process.env.API_KEY,
                 },
                 headers : {
                     'Content-Type' : 'application/json',
@@ -170,12 +171,10 @@ router.get('/allcomments' , async(req,res) => {
                 }
             });
 
-            // console.log('Response =',Response?.data);
+            console.log(' All comments Response =',Response?.data);
 
             const MainComment = Response?.data?.items.map(i  => i?.snippet?.topLevelComment?.snippet?.textOriginal);
-            console.log('main Comment=',MainComment);
             const ChannelId = Response?.data?.items.map(i  => i?.snippet?.topLevelComment?.snippet?.channelId);
-            console.log(' channel id - ',ChannelId);
             
             return res.status(200).json({
                 allcomments : Response?.data?.items.map(i => ({
@@ -197,6 +196,13 @@ router.get('/allcomments' , async(req,res) => {
 router.post('/newcomment' , async(req,res) => {
      try {
         
+        const {  newcomment , channelid } = req.body;
+        console.log('new coment =',{newcomment ,channelid})
+
+        return req.status(200).json({
+            message : " Comment Posted "
+        })
+
      } catch(error){
          console.log(' new comments error =',error);
             return res.status(500).json({
