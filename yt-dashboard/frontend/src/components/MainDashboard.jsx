@@ -92,17 +92,19 @@ const MainDashboard = () => {
     const newcommenthandler = async() => {
         console.log('channel id =',channelid);
 
-        // try {
-        //     const Response = await axios.post(`${BaseUrl}/api/v1/newcomment`, newcomment , {
-        //         headers : {
-        //                'Content-Type' : 'application/json',
-        //                'Authorization' : `Bearer ${AccToken}`
-        //             }
-        //     });
-        //     console.log('Response comment =>',Response);
-        // } catch (error) {
-        //     console.log('new post comment error =',error);
-        // }
+        try {
+            const Response = await axios.post(`${BaseUrl}/api/v1/newcomment`, {
+                newcomment ,channelid
+            } , {
+                headers : {
+                       'Content-Type' : 'application/json',
+                       'Authorization' : `Bearer ${AccToken}`
+                    }
+            });
+            console.log('Response comment =>',Response);
+        } catch (error) {
+            console.log('new post comment error =',error);
+        }
         
     }
 
