@@ -2,8 +2,11 @@ import axios from 'axios';
 import express from 'express';
 const router = express.Router();
 
-const REDIRECT_URI = process.env.NODE_ENV === 'production' ? process.env.BACKEND_AUTH_URL : process.env.Redirect_uri
+import dotenv from 'dotenv';
+dotenv.config();
 
+
+const REDIRECT_URI = process.env.NODE_ENV === 'production' ? process?.env?.BACKEND_AUTH_URL : process?.env?.Redirect_uri
 const FRONTEND_URL = process.env.NODE_ENV === 'production' ? process.env.FRONTEND_PROD_URL : 'http://localhost:5173'
 
 
@@ -95,7 +98,7 @@ router.get('/videoid' , async(req,res) => {
 router.put('/contentdetails' , async(req,res) => {
         try {
 
-             const AccessToken = req?.headers?.authorization.split('Bearer')[1];
+            const AccessToken = req?.headers?.authorization.split('Bearer')[1];
 
             if(!AccessToken){
                 return res.status(401).json({
@@ -142,4 +145,63 @@ router.put('/contentdetails' , async(req,res) => {
         }
 })
 
+router.get('/allcomments' , async(req,res) => {
+    try {
+        
+           const AccessToken = req?.headers?.authorization.split('Bearer')[1];
+           console.log('acc token =',AccessToken);
+
+            if(!AccessToken){
+                return res.status(401).json({
+                    success : false,
+                    message : "UnAuthorized Error"
+                })
+            }
+
+            const Response  = await axios.get(`${process.env.MAIN_URL}/commentThreads`,{
+                params : {
+                    part :  'snippet,replies',
+                    videoId : 'zhuYZAIKHCQ',
+                    key : process.env.API_KEY
+                },
+                headers : {
+                    'Content-Type' : 'application/json',
+                    'Authorization' : `Bearer ${AccessToken}`
+                }
+            });
+
+            // console.log('Response =',Response?.data);
+
+            const MainComment = Response?.data?.items.map(i  => i?.snippet?.topLevelComment?.snippet?.textOriginal);
+            console.log('main Comment=',MainComment);
+            const ChannelId = Response?.data?.items.map(i  => i?.snippet?.topLevelComment?.snippet?.channelId);
+            console.log(' channel id - ',ChannelId);
+            
+            return res.status(200).json({
+                allcomments : Response?.data?.items.map(i => ({
+                     textOriginal : i?.snippet?.topLevelComment?.snippet?.textOriginal,
+                     channelid :  i?.snippet?.topLevelComment?.snippet?.channelId   
+                })),
+                success : true,
+                message : " Fetched Alll Comments "
+            })
+
+    } catch (error) {
+          console.log(' all comments error =',error);
+            return res.status(500).json({
+              message : "Unable to get All Comments"
+            })
+    }
+}) 
+
+router.post('/newcomment' , async(req,res) => {
+     try {
+        
+     } catch(error){
+         console.log(' new comments error =',error);
+            return res.status(500).json({
+              message : "Unable to post New Comment"
+         })
+     }
+})
 export default router;
