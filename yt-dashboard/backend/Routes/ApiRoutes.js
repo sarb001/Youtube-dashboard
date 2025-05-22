@@ -57,19 +57,20 @@ router.get('/callbackurl' , async(req,res) => {
 router.post('/refreshtoken' , async(req,res) => {
     try {
 
-          const { Refreshtoken } = req.body;
-          console.log('refresh token =',Refreshtoken);
-          if(!Refreshtoken){
+          const { refresh_token } = req.body;
+          console.log('refresh token == ',refresh_token );
+
+          if(!refresh_token){
              return res.status(401).json({
                  message : "Refresh token not Found"
              })
           }
         
         const Response = await axios.post(process.env.Token_url,{
+                 grant_type : "refresh_token",
                 client_id : process.env.CLIENT_ID,
                 client_secret : process.env.CLIENT_SECRET,
-                refresh_token : Refreshtoken,
-                grant_type :  'refresh_token'
+                refresh_token : refresh_token ,
         },{ headers : {
              'Content-Type' : 'application/x-www-form-urlencoded',
         } });
@@ -136,6 +137,7 @@ router.put('/contentdetails' , async(req,res) => {
         try {
 
             const AccessToken = req?.headers?.authorization.split('Bearer')[1];
+            console.log('content token =',AccessToken);
 
             if(!AccessToken){
                 return res.status(401).json({
