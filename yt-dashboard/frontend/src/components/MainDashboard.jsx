@@ -5,14 +5,6 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { BaseUrl } from "../App";
 import { useEffect } from "react";
 
-// search params => accesstoken , refreshtoken
-
-// => stored in localstorage
-
-// => passed in videoid and in others ....
-
-// => after 
-
 
 const MainDashboard = () => {
 
@@ -28,17 +20,24 @@ const MainDashboard = () => {
         videoid: ""
     });
 
-    const [newTitle, setNewTitle] = useState('');
-    const [newDesc, setNewDesc] = useState('');
+    const[formData,setformData] = useState({
+            newTitle : "",
+            newDesc  : "",
+    })
+
     const [isAuthenticated, setisAuthenticated] = useState(false);
     const [newcomment, setnewcomment] = useState('');
     const [allcomments, setallcomments] = useState([]);
 
-    const[MainAccesstoken,setMainAccesstoken]  = useState('');
-    const Refreshtoken = localStorage.getItem('refreshtoken');
-    const Accesstoken  = localStorage.getItem('accesstoken');
-
+    const[MainAccesstoken,setMainAccesstoken]    = useState('');
+    const[MainRefreshtoken,setMainRefreshtoken]  = useState('');
+    
+    
     useEffect(() => {
+        const Accesstoken  = localStorage.getItem('accesstoken');
+        setMainAccesstoken(Accesstoken);
+        const Refreshtoken = localStorage.getItem('refreshtoken');
+        setMainRefreshtoken(Refreshtoken);
 
         const AccToken = searchParams.get('accesstoken');
         const RefToken = searchParams.get('refreshtoken');
@@ -62,17 +61,17 @@ const MainDashboard = () => {
         } else {
             navigate('/')
         }
-    }, [searchParams])
+    }, [MainAccesstoken,searchParams]);
 
-    const NewAccesstoken = async () => {
+    const NewAccesstoken = async () => {           
             const Response = await axios.post(`${BaseUrl}/api/v1/refreshtoken`, {
-                Refreshtoken
+               refresh_token : MainRefreshtoken
             }, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
-        console.log('token response =', Response?.data?.access_token);
+        console.log(' new token response =', Response?.data?.access_token);
         const NewAcctoken = Response?.data?.access_token;
         setMainAccesstoken(NewAcctoken);
         localStorage.setItem('accesstoken', NewAcctoken);
@@ -83,8 +82,8 @@ const MainDashboard = () => {
         try {
             const VideoResp = await axios.get(`${BaseUrl}/api/v1/videoid`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${Accesstoken}`
+                    'Content-Type'  : 'application/json',
+                    'Authorization' : `Bearer ${MainAccesstoken}`
                 }
             })
             console.log('VideoResp =', VideoResp?.data?.videoinfo);
@@ -109,18 +108,23 @@ const MainDashboard = () => {
     const DetailsChangeHandler = async () => {
         try {
 
-            if (Categoryid && videoid) {
+            const { newDesc , newTitle } = formData;
+            const { channelid ,  videoid } = Videodetails;
+
+            if (Videodetails?.channelid && Videodetails?.videoid) {
                 const Response = await axios.put(`${BaseUrl}/api/v1/contentdetails`, {
-                    newTitle, newDesc, Categoryid, videoid
+                    newTitle, newDesc, channelid, videoid
                 }, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${MainAccesstoken}`
                     }
                 });
-                console.log('Response =', Response);
-                setNewTitle("");
-                setNewDesc("");
+                console.log('Response details =', Response);
+                setformData(({
+                    newTitle : "",
+                    newDesc  : ""
+                }));
             }
 
         } catch (error) {
@@ -169,6 +173,10 @@ const MainDashboard = () => {
 
     }
 
+    const handlechange = (e) => {
+        setformData({  ...formData ,[e.target.name] : e.target.value })
+    }
+
     return (
         <div>
             <h2> Welcome to Personlized Youtube Dashboard </h2>
@@ -185,14 +193,18 @@ const MainDashboard = () => {
                         </div>
 
                         <div>
-                            <input type="text" placeholder="Enter New title..." value={newTitle}
-                                onChange={(e) => setNewTitle(e.target.value)}
+                            <input type="text" placeholder="Enter New title..." 
+                               name = "newTitle"
+                              value = {formData?.newTitle}
+                              onChange={handlechange}
                             />
                         </div>
 
                         <div>
-                            <input type="text" placeholder="Enter New Desc..." value={newDesc}
-                                onChange={(e) => setNewDesc(e.target.value)}
+                            <input type="text" placeholder="Enter New Desc..." 
+                                name = "newDesc"
+                                value = {formData?.newDesc}
+                                onChange={handlechange}
                             />
                         </div>
 
