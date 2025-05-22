@@ -41,11 +41,10 @@ router.get('/callbackurl' , async(req,res) => {
            grant_type : 'authorization_code',
         }, { headers : { 'Content-Type' : 'application/json' }})
   
-        const { access_token , refresh_token } = Resp?.data;
-        console.log(' tokens are =',access_token , refresh_token);
+        const { access_token , refresh_token , expires_in } = Resp?.data;
+        console.log(' tokens are =',access_token , refresh_token ,expires_in );
 
-
-        return res.status(200).redirect(`${FRONTEND_URL}/dashboard?accesstoken=${access_token}&refreshtoken=${refresh_token}`)
+        return res.status(200).redirect(`${FRONTEND_URL}/dashboard?accesstoken=${access_token}&refreshtoken=${refresh_token}&expiresin=${expires_in}`)
         
     }catch(error){
         console.log(' callback error =',error);
@@ -55,10 +54,47 @@ router.get('/callbackurl' , async(req,res) => {
     }
 })
 
+router.post('/refreshtoken' , async(req,res) => {
+    try {
+
+          const { Refreshtoken } = req.body;
+          console.log('refresh token =',Refreshtoken);
+          if(!Refreshtoken){
+             return res.status(401).json({
+                 message : "Refresh token not Found"
+             })
+          }
+        
+        const Response = await axios.post(process.env.Token_url,{
+                client_id : process.env.CLIENT_ID,
+                client_secret : process.env.CLIENT_SECRET,
+                refresh_token : Refreshtoken,
+                grant_type :  'refresh_token'
+        },{ headers : {
+             'Content-Type' : 'application/x-www-form-urlencoded',
+        } });
+
+        const { access_token , expires_in } = Response?.data;
+        console.log('Response refresh token =',{ access_token , expires_in } );
+
+        return res.status(200).json({
+            access_token: access_token,
+            message : "Fetched Re-fresh token"
+        })
+
+    } catch (error) {
+        console.log('refresh token error =',error);                                                                         
+        return res.status(500).json({
+            message : "UnAuthorized Error"
+        })
+    }
+})
+
 router.get('/videoid' , async(req,res) => {
     try {
         
         const AccessToken = req?.headers?.authorization.split('Bearer')[1];
+        console.log('acc token =',AccessToken);
 
          if(!AccessToken){
             return res.status(401).json({
@@ -71,8 +107,8 @@ router.get('/videoid' , async(req,res) => {
         const VideoRes = await axios.get(`${process.env.MAIN_URL}/videos` , {
             params : {
                 part :  'snippet,contentDetails,statistics',
-                id : 'zhuYZAIKHCQ',
-                key : process.env.API_KEY
+                id   : 'zhuYZAIKHCQ',
+                key  : process.env.API_KEY
             },
             headers : {
                 'Content-Type' : 'application/json',
@@ -80,7 +116,7 @@ router.get('/videoid' , async(req,res) => {
             }
         })
 
-        console.log('Response -',VideoRes?.data?.items[0]);
+        // console.log('video Response -',VideoRes?.data?.items[0]);
         
         return res.status(200).json({
             videoinfo : VideoRes?.data?.items[0],
@@ -171,7 +207,7 @@ router.get('/allcomments' , async(req,res) => {
                 }
             });
 
-            console.log(' All comments Response =',Response?.data);
+            // console.log(' All comments Response =',Response?.data);
 
             const MainComment = Response?.data?.items.map(i  => i?.snippet?.topLevelComment?.snippet?.textOriginal);
 
@@ -184,7 +220,7 @@ router.get('/allcomments' , async(req,res) => {
             })
 
     } catch (error) {
-          console.log(' all comments error =',error);
+            console.log(' all comments error =',error);
             return res.status(500).json({
               message : "Unable to get All Comments"
             })
