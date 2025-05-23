@@ -32,7 +32,9 @@ const MainDashboard = () => {
     const[MainAccesstoken,setMainAccesstoken]    = useState('');
     const[MainRefreshtoken,setMainRefreshtoken]  = useState('');
     
-    
+        const { newDesc , newTitle } = formData;
+        const { channelid ,  videoid } = Videodetails;
+
     useEffect(() => {
         const Accesstoken  = localStorage.getItem('accesstoken');
         setMainAccesstoken(Accesstoken);
@@ -108,8 +110,6 @@ const MainDashboard = () => {
     const DetailsChangeHandler = async () => {
         try {
 
-            const { newDesc , newTitle } = formData;
-            const { channelid ,  videoid } = Videodetails;
 
             if (Videodetails?.channelid && Videodetails?.videoid) {
                 const Response = await axios.put(`${BaseUrl}/api/v1/contentdetails`, {
@@ -134,7 +134,6 @@ const MainDashboard = () => {
 
     const AllCommenthandler = async () => {
 
-        console.log('acc token =',Accesstoken);
             if(isAuthenticated){
                 try {
                 const Response = await axios.get(`${BaseUrl}/api/v1/allcomments`, {
@@ -154,22 +153,20 @@ const MainDashboard = () => {
     }
 
     const newcommenthandler = async () => {
-        console.log('channel id =', channelid);
-
-        // try {
-        //     const Response = await axios.post(`${BaseUrl}/api/v1/newcomment`, {
-        //         newcomment ,channelid,videoid
-        //     } , {
-        //         headers : {
-        //                'Content-Type' : 'application/json',
-        //                'Authorization' : `Bearer ${AccToken}`
-        //             }
-        //     });
-        //     console.log('Response comment =>',Response);
-        //     setnewcomment("");
-        // } catch (error) {
-        //     console.log('new post comment error =',error);
-        // }
+        try {
+            const Response = await axios.post(`${BaseUrl}/api/v1/newcomment`, {
+                newcomment ,channelid,videoid
+            } , {
+                headers : {
+                       'Content-Type' : 'application/json',
+                       'Authorization' : `Bearer ${MainAccesstoken}`
+                    }
+            });
+            console.log('Response comment =>',Response);
+            setnewcomment("");
+        } catch (error) {
+            console.log('new post comment error =',error);
+        }
 
     }
 
